@@ -257,7 +257,7 @@ mixin RandomMovement on Movement {
   }) {
     // 计算朝向中心点的方向（确保在允许的方向列表中）
     final direction = _getDirectionToCenter(absoluteCenter, center, directions.values);
-    print('d='+direction.toString());
+    // print('d='+direction.toString());
     // 计算需要移动的距离（至少回到范围内，最小1像素）
     final requiredDistance = max(1.0, currentDistance - centerRange + 5); // +5确保回到范围内
     final finalDistance = max(minDistance, requiredDistance);
@@ -332,11 +332,7 @@ mixin RandomMovement on Movement {
 
     final maxValid = sqrt(dx * dx + dy * dy + 2 * t * (dirVec.x * dx + dirVec.y * dy) + t * t);
     return min(maxValid, maxDistance);
-  }
-
-  /// 获取朝向中心点的方向（确保在允许列表中）
-  /// 获取朝向中心点的方向（确保在允许列表中且可移动）
-  Direction _getDirectionToCenter(
+  }Direction _getDirectionToCenter(
       Vector2 currentPos,
       Vector2 targetCenter,
       List<Direction> allowedDirections,
@@ -344,27 +340,30 @@ mixin RandomMovement on Movement {
     final dx = targetCenter.x - currentPos.x;
     final dy = targetCenter.y - currentPos.y;
 
-    // 1. 构建候选方向列表（按优先级：主方向→辅方向→所有允许方向）
-    List<Direction> candidates = [];
-
-    // 第一优先级：主方向（距离差更大的轴）
+    // 1. 先确定「朝向目标的核心方向」（优先要校验的target方向）
+    Direction targetPrimaryDir;
     if (dx.abs() > dy.abs()) {
-      candidates.add(dx > 0 ? Direction.right : Direction.left);
+      targetPrimaryDir = dx > 0 ? Direction.right : Direction.left;
     } else {
-      candidates.add(dy > 0 ? Direction.down : Direction.up);
+      targetPrimaryDir = dy > 0 ? Direction.down : Direction.up;
     }
 
-    // 第二优先级：辅方向（次要轴）
+    // 2. 构建候选方向列表（核心优化：把target方向放在最优先位置）
+    List<Direction> candidates = [
+      targetPrimaryDir, // 第一优先级：朝向目标的核心方向（优先校验）
+    ];
+
+    // 第二优先级：辅方向（次要轴，原有逻辑）
     if (dx.abs() > dy.abs()) {
       candidates.add(dy > 0 ? Direction.down : Direction.up);
     } else {
       candidates.add(dx > 0 ? Direction.right : Direction.left);
     }
 
-    // 第三优先级：所有允许的方向（兜底）
+    // 第三优先级：所有剩余允许的方向（兜底，去重）
     candidates.addAll(allowedDirections.where((dir) => !candidates.contains(dir)));
 
-    // 2. 遍历候选方向，选择「允许且可移动」的第一个方向
+    // 3. 遍历候选方向，选择「允许且可移动」的第一个方向（优先target方向）
     for (final dir in candidates) {
       if (allowedDirections.contains(dir) && canMove(dir)) {
         return dir;
