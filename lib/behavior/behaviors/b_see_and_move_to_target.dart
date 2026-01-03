@@ -44,7 +44,7 @@ class BSeeAndMoveToTarget extends Behavior {
               if (comp is Movement) {
                 comp.stopMove();
               }
-              print('comp'+target.toString());
+              // print('comp'+target.toString());
               onClose(dt, target);
               //发送子弹
             },
