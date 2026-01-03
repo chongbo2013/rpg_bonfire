@@ -16,16 +16,15 @@ extension EnemyExtensions on Enemy {
     VoidCallback? execute,
     Vector2? centerOffset,
     double? marginFromCenter,
+    GameComponent? targetPlayer
   }) {
     if (!checkInterval('attackMelee', interval, lastDt) || isDead) {
       return;
     }
 
-    final direct = direction ??
-        (gameRef.player != null
-            ? getDirectionToTarget(gameRef.player!)
-            : lastDirection);
-
+    final direct = targetPlayer==null?(gameRef.player != null
+        ? getDirectionToTarget(gameRef.player!)
+        : lastDirection):(getDirectionToTarget(targetPlayer));
     simpleAttackMeleeByDirection(
       damage: damage,
       direction: direct,
@@ -59,6 +58,7 @@ extension EnemyExtensions on Enemy {
     VoidCallback? execute,
     Vector2? centerOffset,
     LightingConfig? lightingConfig,
+    GameComponent?  targetPlayer
   }) {
     if (!checkInterval('attackRange', interval, lastDt) || isDead) {
       return;
@@ -69,7 +69,7 @@ extension EnemyExtensions on Enemy {
         animation: animation,
         animationDestroy: animationDestroy,
         size: size,
-        angle: getAngleToPlayer(),
+        angle: targetPlayer!=null?getAngleToTarget(targetPlayer):getAngleToPlayer(),
         id: id,
         speed: speed,
         damage: damage,
@@ -82,9 +82,9 @@ extension EnemyExtensions on Enemy {
         centerOffset: centerOffset
       );
     } else {
-      final direct = gameRef.player != null
+      final direct = targetPlayer==null?(gameRef.player != null
           ? getDirectionToTarget(gameRef.player!)
-          : lastDirection;
+          : lastDirection):(getDirectionToTarget(targetPlayer));
       simpleAttackRangeByDirection(
         animationRight: animation,
         animationDestroy: animationDestroy,

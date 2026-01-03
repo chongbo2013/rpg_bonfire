@@ -19,6 +19,11 @@ class FlyingAttackGameObject extends AnimatedGameObject
   double _senAngle = 0;
   ShapeHitbox? collision;
 
+  // 新增：可碰撞的物体数量（默认1）
+  final int attachCount;
+  // 新增：剩余可碰撞次数（核心计数变量）
+  int _remainingAttachCount;
+
   FlyingAttackGameObject({
     required super.position,
     required super.size,
@@ -36,7 +41,9 @@ class FlyingAttackGameObject extends AnimatedGameObject
     this.enabledDiagonal = true,
     super.lightingConfig,
     this.collision,
-  }) {
+    // 新增参数：默认值1，指定可碰撞的物体数量
+    this.attachCount = 1,
+  }) : _remainingAttachCount = attachCount { // 初始化剩余可碰撞次数
     this.speed = speed;
 
     _cosAngle = cos(angle);
@@ -65,7 +72,9 @@ class FlyingAttackGameObject extends AnimatedGameObject
     this.enabledDiagonal = true,
     super.lightingConfig,
     this.collision,
-  }) {
+    // 新增参数：默认值1
+    this.attachCount = 1,
+  }) : _remainingAttachCount = attachCount { // 初始化剩余可碰撞次数
     this.speed = speed;
     moveFromDirection(direction!, enabledDiagonal: enabledDiagonal);
   }
@@ -86,7 +95,9 @@ class FlyingAttackGameObject extends AnimatedGameObject
     this.enabledDiagonal = true,
     super.lightingConfig,
     this.collision,
-  }) : direction = null {
+    // 新增参数：默认值1
+    this.attachCount = 1,
+  }) : direction = null, _remainingAttachCount = attachCount { // 初始化剩余可碰撞次数
     this.speed = speed;
 
     _cosAngle = cos(angle);
@@ -114,8 +125,21 @@ class FlyingAttackGameObject extends AnimatedGameObject
     return super.onComponentTypeCheck(other);
   }
 
+  // 核心修改：添加碰撞次数限制逻辑
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    // 1. 剩余可碰撞次数 <= 0 时，直接返回，不处理任何碰撞逻辑
+    if (_remainingAttachCount <= 0) {
+      super.onCollision(intersectionPoints, other);
+      return;
+    }
+
+    // 2. Sensor 不消耗碰撞次数，直接返回（保持原逻辑）
+    if (other is Sensor) {
+      return;
+    }
+
+    // 3. 处理 Attackable 伤害逻辑（保持原逻辑）
     if (other is Attackable) {
       if (!other.checkCanReceiveDamage(attackFrom)) {
         return;
@@ -126,11 +150,12 @@ class FlyingAttackGameObject extends AnimatedGameObject
       }
     }
 
-    if (other is Sensor) {
-      return;
-    }
+    // 4. 消耗一次可碰撞次数（仅有效碰撞才消耗）
+    _remainingAttachCount--;
 
+    // 5. 执行销毁逻辑（原逻辑保留）
     _destroyObject();
+
     super.onCollision(intersectionPoints, other);
   }
 
@@ -254,9 +279,9 @@ class FlyingAttackGameObject extends AnimatedGameObject
     final innerSize = destroySize ?? size;
     final rect = rectCollision;
     final diffBase = Offset(
-          rect.center.dx + nextX,
-          rect.center.dy + nextY,
-        ) -
+      rect.center.dx + nextX,
+      rect.center.dy + nextY,
+    ) -
         rect.center;
 
     final positionDestroy = center.translated(diffBase.dx, diffBase.dy);
