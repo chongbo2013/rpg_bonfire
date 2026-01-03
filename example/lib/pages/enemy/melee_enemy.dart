@@ -16,6 +16,7 @@ class MeleeEnemy extends SimpleEnemy {
 
   @override
   void update(double dt) {
+    seeAndMoveToAlly(closeAlly: closeAlly)
     seeAndMoveToPlayer(
       closePlayer: (p) {
         animation?.showStroke(Colors.white, 1);
