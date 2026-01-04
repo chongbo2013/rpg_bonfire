@@ -8,7 +8,8 @@ class BSeeAndMoveToTarget extends Behavior {
   final Behavior? doElseBehavior;
   final double distance;
   final MovementAxis movementAxis;
-
+  bool? igoneTarget;//忽略target
+  bool? onlySeeScreen;//仅看屏屏幕可见
   BSeeAndMoveToTarget({
     required this.target,
     required this.onClose,
@@ -17,6 +18,8 @@ class BSeeAndMoveToTarget extends Behavior {
     this.visionAngle,
     this.doElseBehavior,
     this.distance = 5,
+    this.igoneTarget =true,
+    this.onlySeeScreen =true,
     super.id,
   });
   @override
@@ -25,6 +28,8 @@ class BSeeAndMoveToTarget extends Behavior {
       target: target,
       radiusVision: radiusVision,
       visionAngle: visionAngle,
+      igoneTarget: igoneTarget,
+      onlySeeScreen: onlySeeScreen,
       doElseBehavior: BCustom(
         behavior: (dt, comp, game) {
           if (comp is Movement && doElseBehavior == null) {
@@ -43,6 +48,15 @@ class BSeeAndMoveToTarget extends Behavior {
             action: (dt, comp, game) {
               if (comp is Movement) {
                 comp.stopMove();
+              }
+              if(comp is Movement) {
+                final playerDirection = comp.getDirectionToTarget(
+                  target,
+                );
+                comp.lastDirection = playerDirection;
+                if (comp.lastDirection.isHorizontal) {
+                  comp.lastDirectionHorizontal = comp.lastDirection;
+                }
               }
               // print('comp'+target.toString());
               onClose(dt, target);

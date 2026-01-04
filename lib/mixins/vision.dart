@@ -106,8 +106,9 @@ mixin Vision on GameComponent {
     double radiusVision = 32,
     double? visionAngle,
     double angle = 3.14159,
+    bool isVisibles = true
   }) {
-    final compVisible = gameRef.visibles<T>();
+    final compVisible = isVisibles?gameRef.visibles<T>():gameRef.query<T>();
 
     if (compVisible.isEmpty) {
       notObserved?.call();
@@ -127,6 +128,7 @@ mixin Vision on GameComponent {
     }
     return _currentShape = shape;
   }
+
 
   PolygonShape _buildShape(
     double radiusVision,
