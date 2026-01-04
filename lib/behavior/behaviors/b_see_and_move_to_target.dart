@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bonfire/bonfire.dart';
 
 class BSeeAndMoveToTarget extends Behavior {
@@ -10,6 +12,7 @@ class BSeeAndMoveToTarget extends Behavior {
   final MovementAxis movementAxis;
   bool? igoneTarget;//忽略target
   bool? onlySeeScreen;//仅看屏屏幕可见
+  String _intervalKey = '';
   BSeeAndMoveToTarget({
     required this.target,
     required this.onClose,
@@ -21,7 +24,9 @@ class BSeeAndMoveToTarget extends Behavior {
     this.igoneTarget =true,
     this.onlySeeScreen =true,
     super.id,
-  });
+  }){
+    _intervalKey = 'seeAndMoveToTarget${Random().nextInt(10000)}';
+  }
   @override
   bool runAction(double dt, GameComponent comp, BonfireGameInterface game) {
     return BCanSee(
@@ -46,9 +51,7 @@ class BSeeAndMoveToTarget extends Behavior {
           ),
           doBehavior: BAction(
             action: (dt, comp, game) {
-              if (comp is Movement) {
-                comp.stopMove();
-              }
+
               if(comp is Movement) {
                 final playerDirection = comp.getDirectionToTarget(
                   target,
@@ -58,6 +61,13 @@ class BSeeAndMoveToTarget extends Behavior {
                   comp.lastDirectionHorizontal = comp.lastDirection;
                 }
               }
+
+              if (comp is Movement) {
+                if (comp.checkInterval(_intervalKey, 100, dt)) {
+                  comp.stopMove(forceIdle: true);
+                }
+              }
+
               // print('comp'+target.toString());
               onClose(dt, target);
               //发送子弹

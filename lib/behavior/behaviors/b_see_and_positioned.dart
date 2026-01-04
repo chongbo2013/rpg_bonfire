@@ -60,7 +60,7 @@ class BSeeAndPositioned extends Behavior {
                 }
 
                 if (comp.checkInterval(_intervalKey, 100, dt)) {
-                  comp.stopMove();
+                  comp.stopMove(forceIdle: true);
                 }
                 positioned.call(target);
               }
