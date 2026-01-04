@@ -10,7 +10,8 @@ class BSeeAndPositioned extends Behavior {
   final double? minDistance;
   final void Function(GameComponent target) positioned;
   String _intervalKey = '';
-
+  bool? igoneTarget;//忽略target
+  bool? onlySeeScreen;//仅看屏屏幕可见
   BSeeAndPositioned({
     required this.target,
     required this.positioned,
@@ -18,6 +19,8 @@ class BSeeAndPositioned extends Behavior {
     this.visionAngle,
     this.doElseBehavior,
     this.minDistance,
+    this.igoneTarget =true,
+    this.onlySeeScreen =true,
     super.id,
   }) {
     _intervalKey = 'seeAndPositioned${Random().nextInt(10000)}';
@@ -28,6 +31,8 @@ class BSeeAndPositioned extends Behavior {
       target: target,
       radiusVision: radiusVision,
       visionAngle: visionAngle,
+      igoneTarget: igoneTarget,
+      onlySeeScreen: onlySeeScreen,
       doElseBehavior: BCustom(
         behavior: (dt, comp, game) {
           if (comp is Movement && doElseBehavior == null) {
