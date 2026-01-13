@@ -118,6 +118,10 @@ class FlyingAttackGameObject extends AnimatedGameObject
       return false;
     }
 
+    if(other is FlyingAttackGameObject /*&& other.attackFrom == attackFrom*/){
+      return false;
+    }
+
     if (!withDecorationCollision && other is GameDecoration) {
       return false;
     }
@@ -128,17 +132,20 @@ class FlyingAttackGameObject extends AnimatedGameObject
   // 核心修改：添加碰撞次数限制逻辑
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    // 1. 剩余可碰撞次数 <= 0 时，直接返回，不处理任何碰撞逻辑
-    if (_remainingAttachCount <= 0) {
-      super.onCollision(intersectionPoints, other);
-      return;
-    }
+
+
 
     // 2. Sensor 不消耗碰撞次数，直接返回（保持原逻辑）
     if (other is Sensor) {
       return;
     }
-
+    if(other is FlyingAttackGameObject /*&& other.attackFrom == attackFrom*/){
+      return ;
+    }
+    // 1. 剩余可碰撞次数 <= 0 时，直接返回，不处理任何碰撞逻辑
+    if (_remainingAttachCount <= 0) {
+      return;
+    }
     // 3. 处理 Attackable 伤害逻辑（保持原逻辑）
     if (other is Attackable) {
       if (!other.checkCanReceiveDamage(attackFrom)) {
@@ -316,6 +323,7 @@ class FlyingAttackGameObject extends AnimatedGameObject
     gameRef.add(
       DamageHitbox(
         id: id,
+        attachCount: attachCount,
         position: rectPosition.positionVector2,
         damage: damage,
         origin: attackFrom,

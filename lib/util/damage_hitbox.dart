@@ -7,6 +7,7 @@ class DamageHitbox extends GameComponent {
   final Duration duration;
   final Duration damageInterval;
   final AttackOriginEnum origin;
+  final int attachCount;
   final dynamic id;
   final void Function(Attackable attackable)? onDamage;
 
@@ -23,6 +24,7 @@ class DamageHitbox extends GameComponent {
     Anchor anchor = Anchor.center,
     this.damageInterval = const Duration(seconds: 1),
     this.duration = const Duration(milliseconds: 200),
+    this.attachCount = 1,
   }) {
     this.angle = angle;
     this.anchor = anchor;
@@ -48,14 +50,18 @@ class DamageHitbox extends GameComponent {
           dt,
         ) &&
         !isRemoving) {
+      int attackIndex = 0;
       gameRef
           .attackables(onlyVisible: true)
           .where((a) => a.rectAttackable().overlaps(toAbsoluteRect()))
           .forEach((attackable) {
-        final receiveDamage = attackable.handleAttack(origin, damage, id);
-        if (receiveDamage) {
-          onDamage?.call(attackable);
-        }
+            if(attackIndex<attachCount) {
+              final receiveDamage = attackable.handleAttack(origin, damage, id);
+              if (receiveDamage) {
+                onDamage?.call(attackable);
+              }
+              attackIndex+=1;
+            }
       });
     }
 

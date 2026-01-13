@@ -172,6 +172,7 @@ extension GameComponentExtensions on GameComponent {
     Future<SpriteAnimation>? animation,
     bool withPush = true,
     double marginFromCenter = 0,
+    int attachCount =1,
     Vector2? centerOffset,
     void Function(Attackable attackable)? onDamage,
   }) {
@@ -216,6 +217,7 @@ extension GameComponentExtensions on GameComponent {
         origin: attackFrom,
         size: size,
         angle: angle,
+        attachCount: attachCount,
         id: id,
         onDamage: (attackable) {
           onDamage?.call(attackable);
