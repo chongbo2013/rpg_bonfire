@@ -55,7 +55,8 @@ class DamageHitbox extends GameComponent {
           .attackables(onlyVisible: true)
           .where((a) => a.rectAttackable().overlaps(toAbsoluteRect()))
           .forEach((attackable) {
-            if(attackIndex<attachCount) {
+            if(attackIndex<attachCount&&!isSelfGameObject(attackable,origin)) {
+              print('attack=$attackable,attackIndex=$attackIndex,attachCount=$attachCount,origin=$origin');
               final receiveDamage = attackable.handleAttack(origin, damage, id);
               if (receiveDamage) {
                 onDamage?.call(attackable);
@@ -77,5 +78,18 @@ class DamageHitbox extends GameComponent {
       );
     }
     super.render(canvas);
+  }
+
+  bool isSelfGameObject(Attackable attackable, AttackOriginEnum origin) {
+    if(attackable is Player ||attackable is Ally){//玩家
+       if(origin ==AttackOriginEnum.PLAYER_OR_ALLY){
+         return true;
+       }
+    }else{
+      if(origin ==AttackOriginEnum.ENEMY){
+        return true;
+      }
+    }
+    return false;
   }
 }
