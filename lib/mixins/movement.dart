@@ -23,6 +23,7 @@ mixin Movement on GameComponent {
   double get diagonalSpeed => speed * diaginalReduction;
   double get dtSpeed => speed * lastDt;
   double get dtDiagonalSpeed => diagonalSpeed * lastDt;
+  bool needMoveMent = true;
   set velocity(Vector2 velocity) {
     _velocity = velocity;
     _updateLastDirection(_velocity);
@@ -206,7 +207,9 @@ mixin Movement on GameComponent {
   @override
   void update(double dt) {
     super.update(dt);
-    _updatePosition(dt);
+    if(needMoveMent) {
+      _updatePosition(dt);
+    }
   }
 
   void moveFromDirection(
