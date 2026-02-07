@@ -56,7 +56,7 @@ class DamageHitbox extends GameComponent {
           .where((a) => a.rectAttackable().overlaps(toAbsoluteRect()))
           .forEach((attackable) {
             if(attackIndex<attachCount&&!isSelfGameObject(attackable,origin)) {
-              print('attack=$attackable,attackIndex=$attackIndex,attachCount=$attachCount,origin=$origin');
+              // print('attack=$attackable,attackIndex=$attackIndex,attachCount=$attachCount,origin=$origin');
               final receiveDamage = attackable.handleAttack(origin, damage, id);
               if (receiveDamage) {
                 onDamage?.call(attackable);
