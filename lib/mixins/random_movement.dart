@@ -76,7 +76,7 @@ mixin RandomMovement on Movement {
     bool isOutOfRange = false;
     double currentDistanceToCenter = 0;
     if (hasCenterRestriction) {
-      currentDistanceToCenter = absoluteCenter.distanceTo(targetCenter!);
+      currentDistanceToCenter = absoluteCenter.distanceTo(targetCenter);
       isOutOfRange = currentDistanceToCenter > targetCenterDistance;
     }
 
@@ -191,7 +191,7 @@ mixin RandomMovement on Movement {
     // 1. 超出范围：强制生成返回中心点的目标
     if (hasCenterRestriction && currentDistanceToCenter > targetCenterDistance) {
       return _generateBackToCenterTarget(
-        center: targetCenter!,
+        center: targetCenter,
         centerRange: targetCenterDistance,
         currentDistance: currentDistanceToCenter,
         minDistance: minDistance,
@@ -210,7 +210,7 @@ mixin RandomMovement on Movement {
       if (hasCenterRestriction) {
         validMaxDistance = _getMaxValidDistance(
           currentPos: absoluteCenter,
-          center: targetCenter!,
+          center: targetCenter,
           centerRange: targetCenterDistance,
           direction: direction,
           maxDistance: maxDistance,

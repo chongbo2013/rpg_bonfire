@@ -1,7 +1,3 @@
-import 'package:bonfire/base/bonfire_game_interface.dart';
-import 'package:bonfire/base/game_component.dart';
-import 'package:bonfire/behavior/behavior.dart';
-import 'package:bonfire/mixins/random_movement.dart';
 import 'package:bonfire/bonfire.dart';
 class BRandomMovement extends Behavior {
   final double? speed;
