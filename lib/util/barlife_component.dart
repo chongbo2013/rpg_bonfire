@@ -30,7 +30,6 @@ class BarLifeComponent extends GameComponent {
 
   TextPaint _textConfig = TextPaint();
   final GameComponent target;
-
   BarLifeComponent({
     required this.target,
     Vector2? offset,
@@ -87,6 +86,9 @@ class BarLifeComponent extends GameComponent {
 
   @override
   void render(Canvas canvas) {
+    if(!show){
+      return;
+    }
     var yPosition = y - height;
     var xPosition = (target.size.x - width) / 2;
     switch (drawPosition) {
