@@ -62,6 +62,7 @@ mixin RandomMovement on Movement {
         int timeKeepStopped = 2000, // 随机停留时间（毫秒）
         bool updateAngle = false,
         bool checkDirectionWithRayCast = false,
+        Iterable<ShapeHitbox>? ignoreHitboxes,
         RandomMovementDirections directions = RandomMovementDirections.all,
         Function(Direction direction)? onStartMove,
         Function()? onStopMove,
@@ -106,6 +107,7 @@ mixin RandomMovement on Movement {
           targetCenter: targetCenter,
           targetCenterDistance: targetCenterDistance,
           currentDistanceToCenter: currentDistanceToCenter,
+          ignoreHitboxes: ignoreHitboxes
         );
 
         // 强制保证生成有效目标（永不返回null）
@@ -122,7 +124,7 @@ mixin RandomMovement on Movement {
     // 4. 执行移动（只要有目标就移动，永不停止）
     if (_distanceToArrived != null) {
       _travelledDistance = absoluteCenter.distanceTo(_originPosition);
-      final isCanMove = canMove(_currentDirection, displacement: speed ?? this.speed);
+      final isCanMove = canMove(_currentDirection, displacement: speed ?? this.speed,ignoreHitboxes: ignoreHitboxes);
 
       // 移动距离达标/无法移动：仅重置状态，不停止漫游
       if (_travelledDistance >= _distanceToArrived! || !isCanMove) {
@@ -185,6 +187,7 @@ mixin RandomMovement on Movement {
     required Vector2? targetCenter,
     required double targetCenterDistance,
     required double currentDistanceToCenter,
+    Iterable<ShapeHitbox>? ignoreHitboxes,
   }) {
     final hasCenterRestriction = targetCenter != null && targetCenterDistance > 0;
 
@@ -197,6 +200,7 @@ mixin RandomMovement on Movement {
         minDistance: minDistance,
         directions: directions,
         checkRayCast: checkDirectionWithRayCast,
+        ignoreHitboxes: ignoreHitboxes
       );
     }
 
@@ -229,6 +233,7 @@ mixin RandomMovement on Movement {
         direction: direction,
         distance: finalDistance,
         checkRayCast: checkDirectionWithRayCast,
+        ignoreHitboxes: ignoreHitboxes
       )) {
         return _RandomPositionTarget(
           position: targetPos,
@@ -254,9 +259,10 @@ mixin RandomMovement on Movement {
     required double minDistance,
     required RandomMovementDirections directions,
     required bool checkRayCast,
+    Iterable<ShapeHitbox>? ignoreHitboxes
   }) {
     // 计算朝向中心点的方向（确保在允许的方向列表中）
-    final direction = _getDirectionToCenter(absoluteCenter, center, directions.values);
+    final direction = _getDirectionToCenter(absoluteCenter, center, directions.values,ignoreHitboxes: ignoreHitboxes);
     // print('d='+direction.toString());
     // 计算需要移动的距离（至少回到范围内，最小1像素）
     final requiredDistance = max(1.0, currentDistance - centerRange + 5); // +5确保回到范围内
@@ -275,11 +281,12 @@ mixin RandomMovement on Movement {
     required Vector2? center,
     required double minDistance,
     required RandomMovementDirections directions,
+    Iterable<ShapeHitbox>? ignoreHitboxes
   }) {
     Direction direction = directions.values.first;
     // 有中心点：朝向中心点
     if (center != null) {
-      direction = _getDirectionToCenter(absoluteCenter, center, directions.values);
+      direction = _getDirectionToCenter(absoluteCenter, center, directions.values,ignoreHitboxes: ignoreHitboxes);
     }
     // 无中心点：随机方向
     else {
@@ -299,6 +306,7 @@ mixin RandomMovement on Movement {
     required Direction direction,
     required double distance,
     required bool checkRayCast,
+    Iterable<ShapeHitbox>? ignoreHitboxes
   }) {
     // 区域检测
     if (randomMovementArea != null && !randomMovementArea!.containsPoint(targetPos)) {
@@ -306,7 +314,7 @@ mixin RandomMovement on Movement {
     }
 
     // 射线检测
-    if (checkRayCast && !canMove(direction, displacement: distance)) {
+    if (checkRayCast && !canMove(direction, displacement: distance,ignoreHitboxes:ignoreHitboxes )) {
       return false;
     }
 
@@ -332,10 +340,11 @@ mixin RandomMovement on Movement {
 
     final maxValid = sqrt(dx * dx + dy * dy + 2 * t * (dirVec.x * dx + dirVec.y * dy) + t * t);
     return min(maxValid, maxDistance);
-  }Direction _getDirectionToCenter(
+  }
+  Direction _getDirectionToCenter(
       Vector2 currentPos,
       Vector2 targetCenter,
-      List<Direction> allowedDirections,
+      List<Direction> allowedDirections,{Iterable<ShapeHitbox>? ignoreHitboxes}
       ) {
     final dx = targetCenter.x - currentPos.x;
     final dy = targetCenter.y - currentPos.y;
@@ -365,7 +374,7 @@ mixin RandomMovement on Movement {
 
     // 3. 遍历候选方向，选择「允许且可移动」的第一个方向（优先target方向）
     for (final dir in candidates) {
-      if (allowedDirections.contains(dir) && canMove(dir)) {
+      if (allowedDirections.contains(dir) && canMove(dir,ignoreHitboxes: ignoreHitboxes)) {
         return dir;
       }
     }

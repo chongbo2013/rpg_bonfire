@@ -9,6 +9,7 @@ class BRandomMovement extends Behavior {
   final RandomMovementDirections allowDirections;
   final Vector2? targetCenter;
   final double targetCenterDistance;
+  Iterable<ShapeHitbox>? ignoreHitboxes;
   BRandomMovement({
     this.speed,
     this.maxDistance = 50,
@@ -19,6 +20,7 @@ class BRandomMovement extends Behavior {
     this.allowDirections = RandomMovementDirections.all,
      this.targetCenter,
     this.targetCenterDistance = 60,
+    this.ignoreHitboxes,
     super.id,
   });
   @override
@@ -29,6 +31,7 @@ class BRandomMovement extends Behavior {
         speed: speed,
         maxDistance: maxDistance,
         minDistance: minDistance,
+        ignoreHitboxes: ignoreHitboxes,
         checkDirectionWithRayCast: checkDirectionWithRayCast,
         timeKeepStopped: timeKeepStopped,
         updateAngle: updateAngle,
