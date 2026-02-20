@@ -8,6 +8,7 @@ mixin MoveCameraUsingGesture on GameComponent {
   bool _onlyMouse = false;
   MouseButton _mouseButton = MouseButton.left;
 
+  bool enableMoveCamera =false;
   void setupMoveCameraUsingGesture({
     bool onlyMouse = false,
     MouseButton mouseButton = MouseButton.left,
@@ -25,22 +26,23 @@ mixin MoveCameraUsingGesture on GameComponent {
 
   @override
   bool handlerPointerMove(PointerMoveEvent event) {
-    final distance = _startPoint.distanceTo(event.position.toVector2());
-    if (distance > 1) {
-      if (_acceptGesture(event, _mouseButton)) {
-        final zoom = gameRef.camera.zoom;
-        final px = _startPoint.x - event.position.dx;
-        final py = _startPoint.y - event.position.dy;
-        gameRef.camera.stop();
-        gameRef.camera.moveTo(
-          _startCameraPosition.translated(
-            px / zoom,
-            py / zoom,
-          ),
-        );
+    if(enableMoveCamera) {
+      final distance = _startPoint.distanceTo(event.position.toVector2());
+      if (distance > 1) {
+        if (_acceptGesture(event, _mouseButton)) {
+          final zoom = gameRef.camera.zoom;
+          final px = _startPoint.x - event.position.dx;
+          final py = _startPoint.y - event.position.dy;
+          gameRef.camera.stop();
+          gameRef.camera.moveTo(
+            _startCameraPosition.translated(
+              px / zoom,
+              py / zoom,
+            ),
+          );
+        }
       }
     }
-
     return super.handlerPointerMove(event);
   }
 
