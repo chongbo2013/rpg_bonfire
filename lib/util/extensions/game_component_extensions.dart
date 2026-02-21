@@ -52,6 +52,7 @@ extension GameComponentExtensions on GameComponent {
     dynamic id,
     double speed = 150,
     bool withDecorationCollision = true,
+    bool enableVerifyByTime = false,
     VoidCallback? onDestroy,
     ShapeHitbox? collision,
     LightingConfig? lightingConfig,
@@ -80,6 +81,7 @@ extension GameComponentExtensions on GameComponent {
         angle: angle,
         damage: damage,
         speed: speed,
+        enableVerifyByTime:enableVerifyByTime,
         attackFrom: attackFrom,
         collision: collision,
         withDecorationCollision: withDecorationCollision,
@@ -108,6 +110,7 @@ extension GameComponentExtensions on GameComponent {
     LightingConfig? lightingConfig,
     Future<SpriteAnimation>? animationDestroy,
     double marginFromOrigin = 16,
+    bool enableVerifyByTime = false,
     Vector2? centerOffset,
   }) {
     simpleAttackRangeByAngle(
@@ -116,6 +119,7 @@ extension GameComponentExtensions on GameComponent {
       attackFrom: attackFrom,
       damage: damage,
       size: size,
+      enableVerifyByTime: enableVerifyByTime,
       animationDestroy: animationDestroy,
       centerOffset: centerOffset,
       marginFromOrigin: marginFromOrigin,

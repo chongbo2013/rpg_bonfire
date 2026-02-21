@@ -93,6 +93,7 @@ class FlyingAttackGameObject extends AnimatedGameObject
     this.withDecorationCollision = true,
     this.onDestroy,
     this.enabledDiagonal = true,
+    this.enableVerifyByTime = false,
     super.lightingConfig,
     this.collision,
     // 新增参数：默认值1
@@ -183,11 +184,21 @@ class FlyingAttackGameObject extends AnimatedGameObject
     onDestroy?.call();
   }
 
+  bool enableVerifyByTime = false;//判断超过5s则移除
+  double totalVerifyTime = 0;
+  int verifyTimeValue = 5;
   void _verifyExistInWorld(double dt) {
     if (checkInterval('checkCanSee', 1000, dt) && !isRemoving) {
-      final canSee = gameRef.camera.canSee(this);
-      if (!canSee) {
-        removeFromParent();
+      if(enableVerifyByTime){
+        totalVerifyTime+=dt;
+        if(totalVerifyTime>=verifyTimeValue){
+          removeFromParent();
+        }
+      }else {
+        final canSee = gameRef.camera.canSee(this);
+        if (!canSee) {
+          removeFromParent();
+        }
       }
     }
   }
