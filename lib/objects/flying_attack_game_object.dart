@@ -17,6 +17,7 @@ class FlyingAttackGameObject extends AnimatedGameObject
   final Vector2? destroySize;
   double _cosAngle = 0;
   double _senAngle = 0;
+  bool onlyVisible = true;
   ShapeHitbox? collision;
 
   // 新增：可碰撞的物体数量（默认1）
@@ -35,6 +36,7 @@ class FlyingAttackGameObject extends AnimatedGameObject
     this.destroySize,
     double speed = 150,
     this.damage = 1,
+    this.onlyVisible =true,
     this.attackFrom = AttackOriginEnum.ENEMY,
     this.withDecorationCollision = true,
     this.onDestroy,
@@ -65,6 +67,7 @@ class FlyingAttackGameObject extends AnimatedGameObject
     this.animationDestroy,
     this.destroySize,
     double speed = 150,
+    this.onlyVisible =true,
     this.damage = 1,
     this.attackFrom = AttackOriginEnum.ENEMY,
     this.withDecorationCollision = true,
@@ -89,6 +92,7 @@ class FlyingAttackGameObject extends AnimatedGameObject
     this.destroySize,
     double speed = 150,
     this.damage = 1,
+    this.onlyVisible =true,
     this.attackFrom = AttackOriginEnum.ENEMY,
     this.withDecorationCollision = true,
     this.onDestroy,
@@ -111,6 +115,7 @@ class FlyingAttackGameObject extends AnimatedGameObject
   void update(double dt) {
     super.update(dt);
     _verifyExistInWorld(dt);
+    // print('_verifyExistInWorld');
   }
 
   @override
@@ -140,13 +145,16 @@ class FlyingAttackGameObject extends AnimatedGameObject
     if (other is Sensor) {
       return;
     }
+
     if(other is FlyingAttackGameObject /*&& other.attackFrom == attackFrom*/){
       return ;
     }
+
     // 1. 剩余可碰撞次数 <= 0 时，直接返回，不处理任何碰撞逻辑
     if (_remainingAttachCount <= 0) {
       return;
     }
+
     // 3. 处理 Attackable 伤害逻辑（保持原逻辑）
     if (other is Attackable) {
       if (!other.checkCanReceiveDamage(attackFrom)) {
@@ -154,6 +162,7 @@ class FlyingAttackGameObject extends AnimatedGameObject
       }
 
       if (animationDestroy == null) {
+        print('flying onCollision=${animationDestroy}');
         other.handleAttack(attackFrom, damage, id);
       }
     }
@@ -188,9 +197,11 @@ class FlyingAttackGameObject extends AnimatedGameObject
   double totalVerifyTime = 0;
   int verifyTimeValue = 5;
   void _verifyExistInWorld(double dt) {
+    totalVerifyTime+=dt;
+    // print('totalVerifyTime={$totalVerifyTime}');
     if (checkInterval('checkCanSee', 1000, dt) && !isRemoving) {
       if(enableVerifyByTime){
-        totalVerifyTime+=dt;
+
         if(totalVerifyTime>=verifyTimeValue){
           removeFromParent();
         }
@@ -335,6 +346,7 @@ class FlyingAttackGameObject extends AnimatedGameObject
       DamageHitbox(
         id: id,
         attachCount: attachCount,
+        onlyVisible: onlyVisible,
         position: rectPosition.positionVector2,
         damage: damage,
         origin: attackFrom,

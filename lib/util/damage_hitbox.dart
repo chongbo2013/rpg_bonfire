@@ -12,15 +12,17 @@ class DamageHitbox extends GameComponent {
   final void Function(Attackable attackable)? onDamage;
 
   final Paint _paint = Paint()..color = Sensor.color;
-
+  bool onlyVisible = true;
   DamageHitbox({
     required Vector2 position,
     required this.damage,
     required this.origin,
     required Vector2 size,
     this.id,
+    this.onlyVisible = true,
     double angle = 0,
     this.onDamage,
+
     Anchor anchor = Anchor.center,
     this.damageInterval = const Duration(seconds: 1),
     this.duration = const Duration(milliseconds: 200),
@@ -52,7 +54,7 @@ class DamageHitbox extends GameComponent {
         !isRemoving) {
       int attackIndex = 0;
       gameRef
-          .attackables(onlyVisible: true)
+          .attackables(onlyVisible: onlyVisible)
           .where((a) => a.rectAttackable().overlaps(toAbsoluteRect()))
           .forEach((attackable) {
             if(attackIndex<attachCount&&!isSelfGameObject(attackable,origin)) {
