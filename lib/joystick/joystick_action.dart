@@ -21,7 +21,7 @@ class JoystickAction {
 
   late double _sizeBackgroundDirection;
   late double _tileSize;
-
+  bool show = true;
   int? _pointer;
   Rect? _rect;
   Rect? _rectBackgroundDirection;
@@ -45,6 +45,7 @@ class JoystickAction {
     Future<Sprite>? spriteBackgroundDirection,
     this.enableDirection = false,
     this.size = 50,
+    this.show = true,
     this.sizeFactorBackgroundDirection = 1.5,
     this.margin = const EdgeInsets.all(50),
     this.color = Colors.blueGrey,
@@ -105,6 +106,9 @@ class JoystickAction {
   }
 
   void render(Canvas c) {
+    if(!show){
+      return;
+    }
     if (_rectBackgroundDirection != null && _dragging && enableDirection) {
       if (spriteBackgroundDirection == null) {
         _paintBackground?.let((paintBackground) {
@@ -147,6 +151,9 @@ class JoystickAction {
   }
 
   void update(double dt) {
+    if(!show){
+      return;
+    }
     if (_dragPosition == null ||
         _rectBackgroundDirection == null ||
         _rect == null) {
@@ -197,6 +204,9 @@ class JoystickAction {
   }
 
   void actionDown(int pointer, Offset localPosition) {
+    if(!show){
+      return;
+    }
     final pos = getViewportPosition(localPosition);
     if (!_dragging && _rect != null && _rect!.contains(pos)) {
       _pointer = pointer;
@@ -215,6 +225,9 @@ class JoystickAction {
   }
 
   void actionMove(int pointer, Offset localPosition) {
+    if(!show){
+      return;
+    }
     if (pointer == _pointer) {
       if (_dragging) {
         _dragPosition = getViewportPosition(localPosition);
@@ -223,6 +236,9 @@ class JoystickAction {
   }
 
   void actionUp(int pointer) {
+    if(!show){
+      return;
+    }
     if (pointer == _pointer) {
       _dragging = false;
 
